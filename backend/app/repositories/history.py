@@ -55,9 +55,9 @@ def get_run(run_id):
         if not row:
             return None
         d = _row_to_dict(row)
-        from app.services.pad_open_view import open_drop_pad, pad_projection
-        from app.repositories import settings_repo
-        d["result"] = open_drop_pad(d["result"], live_pct=(settings_repo.get_pad_pct_default() if hasattr(settings_repo, "get_pad_pct_default") else None), view="detail")
+        # 详情与列表同一投影：只呈现写入时钉住的口径，不取当前默认重抬
+        from app.services.pad_open_view import open_drop_pad
+        d["result"] = open_drop_pad(d["result"], view="detail")
         return d  # OPEN_VIEW_WIRED
     finally:
         c.close()
