@@ -1,7 +1,7 @@
 <script setup>
-// preferOpenMetric: detail board reads open_projection first when present
-
-// open-view: 开放视图：垫开关保留，面积取未加垫开放路径
+// 面积板只读写入时钉住的 result（pinned projection）。
+// 不读 open_projection 里的另一套值：列表 / 详情 / 投影同源，
+// 开启防压垫时展示的就是含垫层抬升的 paper_m2，详情不退剥回六面×折边。
 
 import { onMounted, ref } from 'vue'
 import { getJSON } from '../api'
@@ -30,11 +30,15 @@ function orderLabel(o) {
     <p v-if="err" class="bad">{{ err }}</p>
     <template v-else-if="run">
       <h1>{{ run.box_name }} <span class="meta">#{{ run.id }}</span></h1>
-      <p class="lede">以下数值为写入时钉住的结果，不随系统默认垫层百分比或默认叠乘顺序变化。</p>
+      <p class="lede">以下数值为写入时钉住的结果，不随系统默认垫层百分比或默认叠乘顺序变化。开启防压垫时，面积板即含垫层抬升，与列表行显示的面积一致。</p>
       <ul class="item-list">
         <li>
-          <span>最终用纸面积 paper_m2</span>
+          <span>最终用纸面积 paper_m2（写入钉住{{ run.pad_enabled ? '，先折边再抬垫' : '' }}）</span>
           <span class="meta"><strong>{{ run.result?.paper_m2 }}</strong> m²</span>
+        </li>
+        <li>
+          <span>列表行面积镜像 list_paper_m2（须与上者一致）</span>
+          <span class="meta">{{ run.result?.list_paper_m2 ?? run.open_projection?.list_paper_m2 ?? '—' }} m²</span>
         </li>
         <li>
           <span>防压垫开关 pad_enabled</span>

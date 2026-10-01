@@ -27,24 +27,29 @@ def _row_to_dict(row):
     return d
 
 def list_runs(limit=50):
+    """列表行：钉住写入时的垫开关/百分比/顺序与抬升面积，不按当前默认重抬。"""
     c = connect()
     try:
         rows = c.execute(
             """SELECT r.*, b.name box_name FROM calc_runs r LEFT JOIN boxes b ON b.id=r.box_id ORDER BY r.id DESC LIMIT ?""",
             (limit,),
         ).fetchall()
-        from app.services.pad_open_view import open_drop_pad
+        from app.services.pad_open_view import pinned_view
         out = []
         for r in rows:
             d = _row_to_dict(r)
-            d["result"] = open_drop_pad(d["result"], view="list")
+            d["result"] = pinned_view(d["result"], view="list")
             out.append(d)
         return out
     finally:
         c.close()
 
 def get_run(run_id):
-    """取单条用纸档。只返回写入时钉住的字段，不按当前默认重算。"""
+    """取单条用纸档。列表与详情共用同一条钉住投影：
+
+    只返回写入时钉住的 pad_enabled/pad_pct/pad_order/paper_m2，
+    不剥垫层、不按当前默认百分比重算、不按新默认顺序重抬。
+    """
     c = connect()
     try:
         row = c.execute(
@@ -55,9 +60,8 @@ def get_run(run_id):
         if not row:
             return None
         d = _row_to_dict(row)
-        from app.services.pad_open_view import open_drop_pad, pad_projection
-        from app.repositories import settings_repo
-        d["result"] = open_drop_pad(d["result"], live_pct=(settings_repo.get_pad_pct_default() if hasattr(settings_repo, "get_pad_pct_default") else None), view="detail")
-        return d  # OPEN_VIEW_WIRED
+        from app.services.pad_open_view import pinned_view
+        d["result"] = pinned_view(d["result"], view="detail")
+        return d
     finally:
         c.close()

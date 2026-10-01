@@ -22,9 +22,7 @@ function padTag(r) {
 <template>
   <div class="page">
     <h1>用纸档</h1>
-    <p class="hint" data-list-pin="pad">列表优先钉写入摘要；详情走开放投影。</p>
-    <p class="hint">列表钉写入摘要（pad / paper_m2）；详情走开放视图字段。</p>
-    <p class="lede">算纸页「写入用纸档」后的落库结果。百分比、面积与叠乘顺序均钉住写入时口径，不随后续默认值重抬。</p>
+    <p class="lede">算纸页「写入用纸档」后的落库结果。列表行与详情板同源：垫开关、百分比、叠乘顺序与含抬升的 paper_m2 均钉住写入时口径，不随后续默认值重抬，也不退剥回未加垫面积。</p>
     <p v-if="err" class="bad">{{ err }}</p>
     <p v-else-if="!items.length" class="empty">还没有写入过。先去算纸试一单。</p>
     <ul v-else class="item-list">
